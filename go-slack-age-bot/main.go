@@ -32,11 +32,19 @@ func main() {
 
 	go printCommandEvents(bot.CommandEvents())
 
-	bot.Command("hello", &slacker.CommandDefinition{
-		Description: "Say Hello",
-		Example:     "hello",
+	bot.Command("my yob is <year>", &slacker.CommandDefinition{
+		Description: "YOB Calculator",
+		Example:     "my yob is 1981",
 		Handler: func(botCtx slacker.BotContext, request slacker.Request, response slacker.ResponseWriter) {
-			response.Reply("Hello")
+			year := request.Param("year")
+			yob, err := strconv.Atoi(year)
+			if err != nil {
+				response.ReportError(err)
+				return
+			}
+			age := time.Now().Year() - yob
+			response.Reply(fmt.Sprintf("Your year of birth is %s", year))
+			response.Reply(fmt.Sprintf("Your age is %d", age))
 		},
 	})
 
